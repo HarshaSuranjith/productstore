@@ -1,26 +1,21 @@
 package product.store.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import product.store.entity.Product;
 
 import java.util.List;
-
-import product.store.entity.Product;
-import product.store.repository.ProductRepository;
+import java.util.Map;
 
 @Service
-public class ProductService {
+public interface ProductService {
 
-    private final ProductRepository productRepository;
+    @Transactional(readOnly = true)
+    List<Product> getAllProducts();
 
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    Product createProduct(Product product);
 
-    public List<Product> getAllProducts() {
-        return (List<Product>) productRepository.findAll();
-    }
+    Product update(Product product);
 
-    public Product createProduct( Product product){
-        return productRepository.save(product);
-    }
+    Product updatePartial(Map<String, Object> values);
 }
