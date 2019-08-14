@@ -6,6 +6,7 @@ import product.store.entity.Product;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public interface ProductService {
@@ -13,9 +14,14 @@ public interface ProductService {
     @Transactional(readOnly = true)
     List<Product> getAllProducts();
 
+    @Transactional
     Product createProduct(Product product);
 
+    @Transactional
     Product update(Product product);
 
+
     Product updatePartial(Map<String, Object> values);
+
+    Optional<Product> findById(Long productId);
 }

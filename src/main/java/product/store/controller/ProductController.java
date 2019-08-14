@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,8 +15,6 @@ import product.store.service.ProductService;
 import product.store.service.ProductServiceImpl;
 
 import javax.validation.Valid;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "products", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -49,7 +48,7 @@ public class ProductController {
         return this.productService.update(product);
     }
 
-    @PatchMapping("products")
+    @PatchMapping
     public ResponseEntity<?> update(@RequestBody Map<String, Object> values) {
         if (values.isEmpty()) {
             return ResponseEntity.badRequest().body("product information is empty");
@@ -58,4 +57,12 @@ public class ProductController {
         return ResponseEntity.ok(updated);
     }
 
+    @GetMapping(value = "/{productId}")
+    public ResponseEntity<?> getById(@PathVariable Long productId) {
+        Optional<Product> product = this.productService.findById(productId);
+        if (!product.isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(product.get());
+    }
 }

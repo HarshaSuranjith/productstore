@@ -1,36 +1,33 @@
 package product.store.controller;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
-import org.hamcrest.core.Is;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.web.client.RestTemplate;
 import product.store.entity.Product;
 import product.store.repository.ProductRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.*;
 
-
-@DataJpaTest
+@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("test")
 public class ProductControllerTest {
 
-    private String baseUrl = "http://localhost:8080";
+    private String baseUrl = "http://localhost:8088";
     private RestTemplate restTemplate = new RestTemplate();
     private String apiUrl = baseUrl + "/products";
 
@@ -38,16 +35,15 @@ public class ProductControllerTest {
     private ProductRepository productRepository;
 
     @Test
-    public void testGetAllProducts_success() {
-
+    public void testAllProducts_success() {
         List<Product> products = restTemplate.getForObject(apiUrl, List.class);
         assertThat(products, is(notNullValue()));
         assertThat(products, hasSize(2));
-
     }
 
     @Test
-    public void testCreateProduct() {
+    @Transactional
+    public void testCreateProduct_success() {
         Product sunlightSoap = Product.of("Sunlight", "ASXD1243432", "General soap product");
         Product product = restTemplate.postForObject(apiUrl, sunlightSoap, Product.class);
 
@@ -56,17 +52,29 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testUpdateProduct() {
+    public void testUpdateProduct_success() {
         String newSerialNumber = "12SFJU784";
 
-        Product cocaCola = Product.of(1001L,"CocaCola", newSerialNumber, "");
+        Product cocacola = this.productRepository.findById(1001L).get();
 
-        restTemplate.put(apiUrl, cocaCola);
-        List<Product> products = restTemplate.getForObject(apiUrl, List.class);
+        cocacola.setSerialNumber(newSerialNumber);
 
-        Product updatedCola = products.stream().filter(p-> p.getId().equals(1001L)).findFirst().get();
+        restTemplate.put(apiUrl, cocacola);
 
-        assertThat(updatedCola.getSerialNumber(), is(newSerialNumber));
+        Product updatedCocaCola = this.productRepository.findById(1001L).get();
+        assertThat(updatedCocaCola.getSerialNumber(), is(newSerialNumber));
+
+    }
+
+    @Test
+    public void testFindById() {
+        String endpoint = apiUrl + "/1001";
+        Product sugar = restTemplate.getForObject(endpoint, Product.class);
+
+        assertThat(sugar.getId(), is(1001L));
+        assertThat(sugar.getName(), is("Sugar"));
+        assertThat(sugar.getSerialNumber(), is("123465XX112"));
+        assertThat(sugar.getDescription(), is(isEmptyString()));
     }
 
 }

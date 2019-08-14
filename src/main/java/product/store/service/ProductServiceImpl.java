@@ -2,10 +2,10 @@ package product.store.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.util.Assert;
 import product.store.entity.Product;
@@ -40,5 +40,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product updatePartial(Map<String, Object> values) {
         return null;
+    }
+
+    @Override
+    public Optional<Product> findById(Long productId) {
+        return this.productRepository.findById(productId);
     }
 }
