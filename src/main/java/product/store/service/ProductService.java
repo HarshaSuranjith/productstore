@@ -11,14 +11,24 @@ import java.util.Optional;
 @Service
 public interface ProductService {
 
+    @Transactional(readOnly = true)
     List<Product> getAllProducts();
 
+    @Transactional
+    Product getProductByProductCode(String productCode);
+
+    @Transactional
     Product createProduct(Product product);
 
+    @Transactional
     Product update(Product product);
 
-
+    @Transactional
     Product updatePartial(Map<String, Object> values);
 
-    Optional<Product> findById(Long productId);
+    @Transactional(readOnly = true)
+    Optional<Product> getProductById(Long productId);
+
+    @Transactional
+    boolean deleteProductByProductCode(Product product);
 }

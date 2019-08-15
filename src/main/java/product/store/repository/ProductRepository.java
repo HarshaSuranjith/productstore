@@ -4,8 +4,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import product.store.entity.Product;
 
-@Repository
-public interface ProductRepository extends CrudRepository<Product, Long>
-{
+import java.util.Optional;
 
+@Repository
+public interface ProductRepository extends CrudRepository<Product, Long> {
+    Product findByProductCode(String productCode);
 }

@@ -1,19 +1,21 @@
 package product.store.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
-@Table(name = "PRODUCT", uniqueConstraints = @UniqueConstraint(name = "uk_product_serial_number", columnNames = {"serial_number"}))
+@Table(name = "PRODUCT", uniqueConstraints = @UniqueConstraint(name = "uk_product_code", columnNames = {"product_code"}))
 public class Product extends BaseEntity {
 
+    @NotEmpty
     @Column(name = "name", length = 1024, nullable = false)
     private String name;
 
-    @Column(name = "serial_number", length = 128, nullable = false, unique = true)
-    private String serialNumber;
+    @NotEmpty
+    @Column(name = "product_code", length = 128, nullable = false, unique = true)
+    private String productCode;
 
     @Column(name = "description", length = 4000)
     private String description;
@@ -21,18 +23,18 @@ public class Product extends BaseEntity {
     public Product() {
     }
 
-    public Product(String name, String serialNumber, String description) {
+    public Product(String name, String productCode, String description) {
         this.name = name;
-        this.serialNumber = serialNumber;
+        this.productCode = productCode;
         this.description = description;
     }
 
-    public static Product of(String name, String serialNumber, String description) {
-        return new Product(name, serialNumber, description);
+    public static Product of(String name, String productCode, String description) {
+        return new Product(name, productCode, description);
     }
 
-    public static Product of(Long id, String name, String serialNumber, String description) {
-        Product product = Product.of(name,serialNumber, description);
+    public static Product of(Long id, String name, String productCode, String description) {
+        Product product = Product.of(name, productCode, description);
         product.setId(id);
         return product;
     }
@@ -45,12 +47,12 @@ public class Product extends BaseEntity {
         this.name = name;
     }
 
-    public String getSerialNumber() {
-        return serialNumber;
+    public String getProductCode() {
+        return productCode;
     }
 
-    public void setSerialNumber(String serialNumber) {
-        this.serialNumber = serialNumber;
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
     }
 
     public String getDescription() {
@@ -59,6 +61,20 @@ public class Product extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public boolean isNew() {
+        return getId() == null;
+    }
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public boolean isValid() {
+        // validation logic including specific business rules
+        return name != null && !name.isEmpty() &&
+                productCode != null && !productCode.isEmpty() && productCode.startsWith("PRO_");
     }
 
 }
