@@ -19,7 +19,6 @@ public class Product extends BaseEntity {
     private String description;
 
     public Product() {
-
     }
 
     public Product(String name, String serialNumber, String description) {

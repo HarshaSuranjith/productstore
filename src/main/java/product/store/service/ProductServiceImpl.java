@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import product.store.entity.Product;
 import product.store.repository.ProductRepository;
@@ -21,6 +22,7 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         return (List<Product>) productRepository.findAll();
     }
@@ -30,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product update(Product product) {
 
         Assert.notNull(product.getId(), "Product 'Id' must be not null");
@@ -38,11 +41,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product updatePartial(Map<String, Object> values) {
         return null;
     }
 
     @Override
+    @Transactional
     public Optional<Product> findById(Long productId) {
         return this.productRepository.findById(productId);
     }

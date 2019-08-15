@@ -11,13 +11,10 @@ import java.util.Optional;
 @Service
 public interface ProductService {
 
-    @Transactional(readOnly = true)
     List<Product> getAllProducts();
 
-    @Transactional
     Product createProduct(Product product);
 
-    @Transactional
     Product update(Product product);
 
 
