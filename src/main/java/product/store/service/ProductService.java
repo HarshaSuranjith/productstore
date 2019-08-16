@@ -31,4 +31,6 @@ public interface ProductService {
 
     @Transactional
     boolean deleteProductByProductCode(Product product);
+
+    Product updatePartial(Long id, String name, String productCode, String description);
 }

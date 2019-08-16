@@ -1,18 +1,18 @@
 package product.store.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import product.store.entity.Product;
 import product.store.exceptions.InvalidProductDetailsException;
 import product.store.exceptions.ProductNotExistingException;
 import product.store.repository.ProductRepository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class ProductServiceImpl implements ProductService {
@@ -58,6 +58,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Product updatePartial(Long Id, String name, String productCode, String description) {
+        Product productInDb = this.productRepository.findById(Id).get();
+        if (!StringUtils.isBlank(name)) {
+            productInDb.setName(name);
+        }
+
+        if (!StringUtils.isBlank(productCode)) {
+            productInDb.setProductCode(productCode);
+        }
+
+        if (!StringUtils.isBlank(description)) {
+            productInDb.setDescription(description);
+        }
+
+        if (!productInDb.isValid()) {
+            throw new InvalidProductDetailsException();
+        }
+        return this.productRepository.save(productInDb);
+
+    }
+
+    @Override
     @Transactional
     public Optional<Product> getProductById(Long productId) {
         return this.productRepository.findById(productId);
@@ -82,4 +104,6 @@ public class ProductServiceImpl implements ProductService {
         }
         return isDeleted;
     }
+
+
 }

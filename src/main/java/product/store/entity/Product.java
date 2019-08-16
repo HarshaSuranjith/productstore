@@ -9,11 +9,9 @@ import javax.validation.constraints.NotEmpty;
 @Table(name = "PRODUCT", uniqueConstraints = @UniqueConstraint(name = "uk_product_code", columnNames = {"product_code"}))
 public class Product extends BaseEntity {
 
-    @NotEmpty
     @Column(name = "name", length = 1024, nullable = false)
     private String name;
 
-    @NotEmpty
     @Column(name = "product_code", length = 128, nullable = false, unique = true)
     private String productCode;
 

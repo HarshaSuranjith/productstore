@@ -1,26 +1,23 @@
 package product.store.controller;
 
-import org.springframework.http.MediaType;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import product.store.entity.Product;
+import product.store.service.ProductService;
+import product.store.service.ProductServiceImpl;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import product.store.entity.Product;
-import product.store.exceptions.InvalidProductDetailsException;
-import product.store.service.ProductService;
-import product.store.service.ProductServiceImpl;
-
-import javax.validation.Valid;
-
 @RestController
-@RequestMapping(value = "products", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(path = "/products", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ProductController {
 
     private static final String RESPONSE_MESSAGE_KEY = "message";
@@ -52,21 +49,24 @@ public class ProductController {
     @ApiOperation("update an existing product in the System")
     @PutMapping
     @ResponseBody
-    public Product update(@RequestBody @Valid Product product) {
+    public Product update(@RequestBody Product product) {
         return this.productService.update(product);
     }
 
     @ApiOperation("Update certain values/fields of a product in the System")
     @PatchMapping
-    public ResponseEntity<?> update(@RequestBody Map<String, Object> values) {
-        if (values.isEmpty()) {
-            return ResponseEntity.badRequest().body("product information is empty");
+    public ResponseEntity<?> update(@RequestParam Long Id,
+                                    @RequestParam(required = false) String name,
+                                    @RequestParam(required = false) String productCode,
+                                    @RequestParam(required = false) String description) {
+        if (StringUtils.isBlank(name) && StringUtils.isBlank(productCode) && StringUtils.isBlank(description)) {
+            return ResponseEntity.badRequest().build();
         }
-        Product updated = this.productService.updatePartial(values);
-        return ResponseEntity.ok(updated);
+        Product update = this.productService.updatePartial(Id, name, productCode, description);
+        return ResponseEntity.ok(update);
     }
 
-    @ApiOperation(("Get details a product using product Id"))
+    @ApiOperation(("Get details of a product using product Id"))
     @GetMapping(value = "/{productId}")
     public ResponseEntity<?> getById(@PathVariable Long productId) {
         Optional<Product> product = this.productService.getProductById(productId);
